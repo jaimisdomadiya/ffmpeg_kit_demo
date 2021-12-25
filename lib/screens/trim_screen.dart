@@ -4,12 +4,12 @@ import 'dart:io';
 import 'package:ffmpeg_kit/screens/home_screen.dart';
 import 'package:ffmpeg_kit/widget/textformfield.dart';
 import 'package:ffmpeg_kit/widget/video_widget.dart';
-import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
-import 'package:ffmpeg_kit_flutter/ffprobe_kit.dart';
-import 'package:ffmpeg_kit_flutter/log.dart';
-import 'package:ffmpeg_kit_flutter/media_information_session.dart';
-import 'package:ffmpeg_kit_flutter/session.dart';
-import 'package:ffmpeg_kit_flutter/statistics.dart';
+import 'package:ffmpeg_kit_flutter_min_gpl/ffmpeg_kit.dart';
+import 'package:ffmpeg_kit_flutter_min_gpl/ffprobe_kit.dart';
+import 'package:ffmpeg_kit_flutter_min_gpl/log.dart';
+import 'package:ffmpeg_kit_flutter_min_gpl/media_information_session.dart';
+import 'package:ffmpeg_kit_flutter_min_gpl/session.dart';
+import 'package:ffmpeg_kit_flutter_min_gpl/statistics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -305,7 +305,7 @@ class _TrimScreenState extends State<TrimScreen> {
           }
         }, (Log log) {
           // CALLED WHEN SESSION PRINTS LOGS
-        }, (Statistics statistics) {
+        }, (Statistics statistics) async {
           // CALLED WHEN SESSION GENERATES STATISTICS
         });
       } catch (e) {

@@ -2,12 +2,14 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:ffmpeg_kit/screens/video_player_screen.dart';
-import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
-import 'package:ffmpeg_kit_flutter/ffprobe_kit.dart';
-import 'package:ffmpeg_kit_flutter/log.dart';
-import 'package:ffmpeg_kit_flutter/media_information_session.dart';
-import 'package:ffmpeg_kit_flutter/session.dart';
-import 'package:ffmpeg_kit_flutter/statistics.dart';
+import 'package:ffmpeg_kit/utils/util.dart';
+import 'package:ffmpeg_kit_flutter_min_gpl/ffmpeg_kit.dart';
+import 'package:ffmpeg_kit_flutter_min_gpl/ffmpeg_kit_config.dart';
+import 'package:ffmpeg_kit_flutter_min_gpl/ffprobe_kit.dart';
+import 'package:ffmpeg_kit_flutter_min_gpl/log.dart';
+import 'package:ffmpeg_kit_flutter_min_gpl/media_information_session.dart';
+import 'package:ffmpeg_kit_flutter_min_gpl/session.dart';
+import 'package:ffmpeg_kit_flutter_min_gpl/statistics.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
@@ -170,7 +172,7 @@ class _CompressScreenState extends State<CompressScreen> {
         appDocPath + "/output${DateTime.now().microsecondsSinceEpoch}.mp4";
     log(outputPath, name: 'outputPath');
 
-    final String ffmpegCommand = "-i ${file!.path} -crf 28 $outputPath";
+    final String ffmpegCommand = "-i ${file!.path} -b 800k $outputPath";
     log(ffmpegCommand, name: '_command');
 
     try {
@@ -179,9 +181,15 @@ class _CompressScreenState extends State<CompressScreen> {
       log('Session Start', name: 'Session Start');
 
       await FFmpegKit.executeAsync(ffmpegCommand, (Session session) async {
-        final code = await session.getReturnCode();
+        final state =
+            FFmpegKitConfig.sessionStateToString(await session.getState());
+        final returnCode = await session.getReturnCode();
+        final failStackTrace = await session.getFailStackTrace();
 
-        if (code?.isValueSuccess() == true) {
+        ffprint(
+            "FFmpeg process exited with state ${state} and rc ${returnCode}.${notNull(failStackTrace, "\\n")}");
+
+        if (returnCode?.isValueSuccess() == true) {
           Navigator.push(context, MaterialPageRoute(builder: (context) {
             return VideoPlayerScreen(file: File(outputPath));
           }));

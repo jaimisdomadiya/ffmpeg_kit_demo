@@ -6,11 +6,11 @@ import 'package:ffmpeg_kit/utils/util.dart';
 import 'package:ffmpeg_kit/utils/validation/validation.dart';
 import 'package:ffmpeg_kit/widget/textformfield.dart';
 import 'package:ffmpeg_kit/widget/video_widget.dart';
-import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
-import 'package:ffmpeg_kit_flutter/ffmpeg_kit_config.dart';
-import 'package:ffmpeg_kit_flutter/ffmpeg_session.dart';
-import 'package:ffmpeg_kit_flutter/return_code.dart';
-import 'package:ffmpeg_kit_flutter/session.dart';
+import 'package:ffmpeg_kit_flutter_min_gpl/ffmpeg_kit.dart';
+import 'package:ffmpeg_kit_flutter_min_gpl/ffmpeg_kit_config.dart';
+import 'package:ffmpeg_kit_flutter_min_gpl/ffmpeg_session.dart';
+import 'package:ffmpeg_kit_flutter_min_gpl/return_code.dart';
+import 'package:ffmpeg_kit_flutter_min_gpl/session.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
@@ -80,8 +80,6 @@ class _CropScreenState extends State<CropScreen> {
       ),
     );
   }
-
-
 
   void _onImageButtonPressed(ImageSource source) async {
     if (_controller != null) {
@@ -188,7 +186,7 @@ class _CropScreenState extends State<CropScreen> {
                     ],
                   ),
                   const SizedBox(height: 30),
-                  roundedButton('Crop', onTap: cropOnClick()),
+                  roundedButton('Crop', onTap: cropOnClick),
                 ],
               ),
             ),

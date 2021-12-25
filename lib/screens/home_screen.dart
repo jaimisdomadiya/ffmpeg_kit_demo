@@ -1,3 +1,4 @@
+import 'package:ffmpeg_kit/screens/compress_screen.dart';
 import 'package:ffmpeg_kit/screens/crop_screen.dart';
 import 'package:ffmpeg_kit/screens/filter_screens.dart';
 import 'package:ffmpeg_kit/screens/trim_screen.dart';
@@ -50,10 +51,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         builder: (context) => const FilterScreens()));
               }),
               roundedButton('Compress', onTap: () {
-                /*Navigator.push(
+                Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const CompressScreen()));*/
+                        builder: (context) => const CompressScreen()));
               }),
             ],
           ),
