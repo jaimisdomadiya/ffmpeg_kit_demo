@@ -2,12 +2,10 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:ffmpeg_kit/screens/home_screen.dart';
+import 'package:ffmpeg_kit/utils/util.dart';
 import 'package:ffmpeg_kit/widget/textformfield.dart';
 import 'package:ffmpeg_kit/widget/video_widget.dart';
 import 'package:ffmpeg_kit_flutter_min_gpl/ffmpeg_kit.dart';
-import 'package:ffmpeg_kit_flutter_min_gpl/ffprobe_kit.dart';
-import 'package:ffmpeg_kit_flutter_min_gpl/log.dart';
-import 'package:ffmpeg_kit_flutter_min_gpl/media_information_session.dart';
 import 'package:ffmpeg_kit_flutter_min_gpl/session.dart';
 import 'package:ffmpeg_kit_flutter_min_gpl/statistics.dart';
 import 'package:flutter/material.dart';
@@ -46,7 +44,7 @@ class _TrimScreenState extends State<TrimScreen> {
   @override
   void initState() {
     // TODO: implement initState
-    startTimeController.text = '00:00:05';
+    startTimeController.text = '00:00:30';
     endTimeController.text = '00:00:40';
     super.initState();
   }
@@ -253,7 +251,7 @@ class _TrimScreenState extends State<TrimScreen> {
     file = await _picker.pickVideo(
         source: source, maxDuration: const Duration(seconds: 10));
 
-    if (file != null) {
+    /*if (file != null) {
       log(file!.path, name: 'File Path');
       FFprobeKit.getMediaInformationAsync(file!.path, (session) async {
         print("Media Information");
@@ -268,7 +266,9 @@ class _TrimScreenState extends State<TrimScreen> {
         log("size: ${information?.getMediaProperties()!['size']}");
       });
       await _playVideo(file);
-    }
+    }*/
+
+    await _playVideo(file);
   }
 
   @override
@@ -294,20 +294,22 @@ class _TrimScreenState extends State<TrimScreen> {
         log(outputPath, name: 'outputPath');
 
         String _command =
-            "-i ${file!.path} -ss ${startTimeController.text.trim()} -to ${endTimeController.text.trim()} -c:a copy $outputPath";
+            "-i ${file!.path} -ss ${startTimeController.text.trim()} -to ${endTimeController.text.trim()} -y $outputPath";
 
-        await FFmpegKit.executeAsync(_command, (Session session) async {
-          final code = await session.getReturnCode();
+        await FFmpegKit.executeAsync(
+            _command,
+            (Session session) async {
+              final code = await session.getReturnCode();
 
-          if (code?.isValueSuccess() == true) {
-            await _playVideo(XFile(outputPath));
-            isLoading.value = false;
-          }
-        }, (Log log) {
-          // CALLED WHEN SESSION PRINTS LOGS
-        }, (Statistics statistics) async {
-          // CALLED WHEN SESSION GENERATES STATISTICS
-        });
+              if (code?.isValueSuccess() == true) {
+                await _playVideo(XFile(outputPath));
+                isLoading.value = false;
+              }
+            },
+            (log) => ffprint(log.getMessage()),
+            (Statistics statistics) async {
+              // CALLED WHEN SESSION GENERATES STATISTICS
+            });
       } catch (e) {
         isLoading.value = true;
       }

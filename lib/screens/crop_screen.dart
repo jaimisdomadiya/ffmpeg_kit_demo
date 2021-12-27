@@ -44,16 +44,17 @@ class _CropScreenState extends State<CropScreen> {
   @override
   void initState() {
     // TODO: implement initState
-    heightController.text = "180";
-    widthController.text = "160";
-    xController.text = "180";
-    yController.text = "160";
+    heightController.text = "418";
+    widthController.text = "479";
+    xController.text = "0";
+    yController.text = "100";
     super.initState();
   }
 
   @override
   void dispose() {
     // TODO: implement dispose
+    FFmpegKit.cancel();
     _controller?.dispose();
     _toBeDisposed?.dispose();
     super.dispose();
@@ -252,10 +253,9 @@ class _CropScreenState extends State<CropScreen> {
         log(outputPath, name: 'outputPath');
 
         String command =
-            "-i ${file!.path} -filter:v crop=w=${widthController.text.trim()}:h=${heightController.text.trim()}:x=${xController.text.trim()}:y=${yController.text.trim()} -c:a copy $outputPath";
+            "-i ${file!.path} -filter:v crop=${widthController.text.trim()}:${heightController.text.trim()}:${xController.text.trim()}:${yController.text.trim()} -y $outputPath";
 
         await FFmpegKit.executeAsync(command, (Session session) async {
-          log(outputPath, name: 'Rotate path');
           final state =
               FFmpegKitConfig.sessionStateToString(await session.getState());
           final returnCode = await session.getReturnCode();
@@ -273,7 +273,7 @@ class _CropScreenState extends State<CropScreen> {
             isLoading.value = false;
             print("Create failed. Please check log for the details.");
           }
-        });
+        }, (log) => ffprint(log.getMessage()));
       } catch (e) {
         isLoading.value = false;
       }

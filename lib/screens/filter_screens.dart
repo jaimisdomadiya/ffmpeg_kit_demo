@@ -235,34 +235,38 @@ class _FilterScreensState extends State<FilterScreens> {
       log(matrix, name: 'matrix');
 
       String _command =
-          "-i ${file!.path} -vf colorchannelmixer=$matrix -pix_fmt yuv420p -c:a copy $outputPath";
+          "-i ${file!.path} -vf colorchannelmixer=$matrix -preset superfast -pix_fmt yuv420p -y $outputPath";
       log(_command, name: '_command');
 
-      await FFmpegKit.executeAsync(_command, (Session session) async {
-        log(outputPath, name: 'Rotate path');
-        final state =
-            FFmpegKitConfig.sessionStateToString(await session.getState());
-        final returnCode = await session.getReturnCode();
-        final failStackTrace = await session.getFailStackTrace();
+      await FFmpegKit.executeAsync(
+        _command,
+        (Session session) async {
+          log(outputPath, name: 'Rotate path');
+          final state =
+              FFmpegKitConfig.sessionStateToString(await session.getState());
+          final returnCode = await session.getReturnCode();
+          final failStackTrace = await session.getFailStackTrace();
 
-        ffprint(
-            "FFmpeg process exited with state ${state} and rc ${returnCode}.${notNull(failStackTrace, "\\n")}");
+          ffprint(
+              "FFmpeg process exited with state ${state} and rc ${returnCode}.${notNull(failStackTrace, "\\n")}");
 
-        if (ReturnCode.isSuccess(returnCode)) {
-          ffprint("Create completed successfully; playing video.");
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => VideoPlayerScreen(
-                        file: File(outputPath),
-                      )));
-          isLoading.value = false;
-          listAllStatistics(session as FFmpegSession);
-        } else {
-          isLoading.value = false;
-          print("Create failed. Please check log for the details.");
-        }
-      });
+          if (ReturnCode.isSuccess(returnCode)) {
+            ffprint("Create completed successfully; playing video.");
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => VideoPlayerScreen(
+                          file: File(outputPath),
+                        )));
+            isLoading.value = false;
+            listAllStatistics(session as FFmpegSession);
+          } else {
+            isLoading.value = false;
+            print("Create failed. Please check log for the details.");
+          }
+        },
+        (log) => ffprint(log.getMessage()),
+      );
     } catch (e) {
       isLoading.value = true;
       debugPrint('Error ===> $e');

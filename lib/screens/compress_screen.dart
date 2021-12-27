@@ -6,7 +6,6 @@ import 'package:ffmpeg_kit/utils/util.dart';
 import 'package:ffmpeg_kit_flutter_min_gpl/ffmpeg_kit.dart';
 import 'package:ffmpeg_kit_flutter_min_gpl/ffmpeg_kit_config.dart';
 import 'package:ffmpeg_kit_flutter_min_gpl/ffprobe_kit.dart';
-import 'package:ffmpeg_kit_flutter_min_gpl/log.dart';
 import 'package:ffmpeg_kit_flutter_min_gpl/media_information_session.dart';
 import 'package:ffmpeg_kit_flutter_min_gpl/session.dart';
 import 'package:ffmpeg_kit_flutter_min_gpl/statistics.dart';
@@ -172,7 +171,7 @@ class _CompressScreenState extends State<CompressScreen> {
         appDocPath + "/output${DateTime.now().microsecondsSinceEpoch}.mp4";
     log(outputPath, name: 'outputPath');
 
-    final String ffmpegCommand = "-i ${file!.path} -b 800k $outputPath";
+    final String ffmpegCommand = "-i ${file!.path} -b 800k -y $outputPath";
     log(ffmpegCommand, name: '_command');
 
     try {
@@ -180,26 +179,28 @@ class _CompressScreenState extends State<CompressScreen> {
 
       log('Session Start', name: 'Session Start');
 
-      await FFmpegKit.executeAsync(ffmpegCommand, (Session session) async {
-        final state =
-            FFmpegKitConfig.sessionStateToString(await session.getState());
-        final returnCode = await session.getReturnCode();
-        final failStackTrace = await session.getFailStackTrace();
+      await FFmpegKit.executeAsync(
+          ffmpegCommand,
+          (Session session) async {
+            final state =
+                FFmpegKitConfig.sessionStateToString(await session.getState());
+            final returnCode = await session.getReturnCode();
+            final failStackTrace = await session.getFailStackTrace();
 
-        ffprint(
-            "FFmpeg process exited with state ${state} and rc ${returnCode}.${notNull(failStackTrace, "\\n")}");
+            ffprint(
+                "FFmpeg process exited with state ${state} and rc ${returnCode}.${notNull(failStackTrace, "\\n")}");
 
-        if (returnCode?.isValueSuccess() == true) {
-          Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return VideoPlayerScreen(file: File(outputPath));
-          }));
-          isLoading.value = false;
-        }
-      }, (Log log) {
-        // CALLED WHEN SESSION PRINTS LOGS
-      }, (Statistics statistics) {
-        // CALLED WHEN SESSION GENERATES STATISTICS
-      });
+            if (returnCode?.isValueSuccess() == true) {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return VideoPlayerScreen(file: File(outputPath));
+              }));
+              isLoading.value = false;
+            }
+          },
+          (log) => ffprint(log.getMessage()),
+          (Statistics statistics) {
+            // CALLED WHEN SESSION GENERATES STATISTICS
+          });
 
       log('Session End', name: 'Session End');
       log('-------------------------------------');
